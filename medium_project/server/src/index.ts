@@ -9,7 +9,6 @@ const app = new Hono<{
   Bindings : {
     DATABASE_URL : string
     JWT_SECRET : string
-    email : string
   }
 }>()
 
@@ -44,43 +43,56 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-app.post('/api/v1/signup', async (c) => {
+app.post('/api/v1/user/signup', async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl : c.env.DATABASE_URL,
   }).$extends(withAccelerate())
   
   const body = await c.req.json() 
   //@ts-ignore
-  const user = await prisma.User.create({
+  //zod, we didn't hashed password
+  
+  let user;
+  try {
+    //@ts-ignore
+    // if(await prisma.user.findUnique({email})){
+    //   return (
+    //     c.json({
+    //       status : 411,
+    //       msg : "User already exists"
+    //     })
+    //   )
+        
+    // }
+    
+    //@ts-ignore
+    user = await prisma.User.create({
       data:{
         //@ts-ignore
         email : body.email,
         //@ts-ignore
         password : body.password
       }
-  })
-  console.log(user)
-  if(!user){
-    return c.json({
-        status : 404,
-        msg :" user not created"
     })
-  }
-  
-  const token = await sign({id : user.id} , c.env.JWT_SECRET)
-  console.log(token)
-  if(!token){
+    const token = await sign({id : user.id} , c.env.JWT_SECRET)
+    console.log(token)
+    if(!token){
+      return c.json({
+        msg : "TOken not created"
+      })
+    }
     return c.json({
-      msg : "TOken not created"
+      token
     })
+  } catch (error) {
+    return c.json({
+      status : 411,
+      msg : "Email already exists"
+    })    
   }
-
-  return c.json({
-    token
-  })
 })
 
-app.post('/api/v1/signin', async (c) => {
+app.post('/api/v1/user/signin', async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl : c.env.DATABASE_URL
   }).$extends(withAccelerate())
