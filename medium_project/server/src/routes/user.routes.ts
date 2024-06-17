@@ -17,8 +17,7 @@ userRoutes.post('/signup', async (c) => {
     }).$extends(withAccelerate())
     
     const body = await c.req.json() 
-    //@ts-ignore
-    //zod, we didn't hashed password
+    //need zod validation in body
     
     let user;
     try {
