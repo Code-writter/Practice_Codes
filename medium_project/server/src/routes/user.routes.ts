@@ -24,12 +24,12 @@ userRoutes.post('/signup', async (c) => {
       //@ts-ignore
       user = await prisma.User.create({
         data:{
-          //@ts-ignore
           email : body.email,
-          //@ts-ignore
-          password : body.password
+          password : body.password,
+          name : body.name
         }
       })
+      console.log(user)
       const token = await sign({id : user.id} , c.env.JWT_SECRET)
   
       if(!token){
