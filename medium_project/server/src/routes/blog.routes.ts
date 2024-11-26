@@ -15,6 +15,13 @@ export const blogRoutes = new Hono<{
     }
 }>()
 
+interface Blog {
+    title : string
+    content : string
+    authorId : string
+}
+
+
 //authenticating all the blog routes
 blogRoutes.use('/*', async (c, next) => {
   
@@ -37,7 +44,7 @@ blogRoutes.use('/*', async (c, next) => {
 
 blogRoutes.post('/create', async (c) => {
 
-    const body = await c.req.json();
+    const body : Blog = await c.req.json();
     const id  = c.get('id')
     const prisma = new PrismaClient({
         datasourceUrl : c.env.DATABASE_URL,
@@ -59,7 +66,7 @@ blogRoutes.post('/create', async (c) => {
 })
 
 blogRoutes.put('/update', async (c) => {
-    const body = await c.req.json();
+    const body : Blog = await c.req.json();
     const id = c.get('id')
     const prisma = new PrismaClient({
         datasourceUrl : c.env.DATABASE_URL,
@@ -67,7 +74,7 @@ blogRoutes.put('/update', async (c) => {
 
     const blog = await prisma.post.update({
         where : {
-            id : body.id
+            id : body.id 
         },
         data :{
             title : body.title,
